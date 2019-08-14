@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="./assets/css/bootstrap-darkly.css">
+  <link rel="stylesheet" href="./assets/css/style.css">
+
+  <title>Queue Monitor</title>
+</head>
+
+<body class="d-flex flex-column h-100">
+  <!-- Begin page content -->
+  <main role="main" class="flex-shrink-0" style="height: 95%;">
+    <div class="row" style="height: 100%; width: 100%;">
+      <div class="col-md-8">
+        <iframe id="ytplayer" type="text/html"
+          src="https://www.youtube.com/embed/XL9HQsWFxgY?playlist=XL9HQsWFxgY&enablejsapi=0&controls=1&loop=1&autoplay=1&origin=http://ict.moph.go.th"
+          frameborder="0"></iframe>
+      </div>
+      <div class="col-md-4">
+        <div class="alert alert-dismissible alert-danger" id="alertErrorMqtt">
+          <!-- <button type="button" class="close" data-dismiss="alert">&times;</button> -->
+          <strong>คำเตือน!</strong> ไม่สามารถเชื่อมต่อ MQTT เซิร์ฟเวอร์ได้
+        </div>
+        <span class="mt-2 btn btn-secondary btn-lg btn-block" id="txtServicePointName"></span>
+        <div class="card text-white bg-success mb-2 mt-2">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-md-8">คิวรับบริการ</div>
+              <div class="col-md-4">ห้องตรวจ</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="currentList">
+
+            </div>
+          </div>
+        </div>
+
+        <div class="card text-white bg-warning mb-2 mt-2">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-md-12 text-center">รอเรียก</div>
+            </div>
+            <div class="row">
+              <div class="col-md-8">คิวรับบริการ</div>
+              <div class="col-md-4">HN</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="nextQueueList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer mt-auto py-3 bg-success text-white">
+    <div style="width: 100%;" class='marquee' data-speed="100" data-direction="left">
+      <span class="font-weight-bolder h4">
+        โรงพยาบาลกันทรวิชัยเปิดรับบริการผู้ป่วยนอกเวลา แผนกทันตกรรม ทุกวันพุธ - ศุกร์
+      </span>
+    </div>
+  </footer>
+
+  <div class="modal" id="modalServicepoints">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">เลือกจุดให้บริการ</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="list-group" id="servicePointList"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- libs -->
+  <script src="./assets/js/libs/jquery.js"></script>
+  <script src="./assets/js/libs/popper.js"></script>
+  <script src="./assets/js/libs/bootstrap.min.js"></script>
+  <script src="./assets/js/libs/howler.js"></script>
+  <script src="./assets/js/libs/moment.js"></script>
+  <script src="./assets/js/libs/lodash.js"></script>
+  <script src="./assets/js/libs/mqtt.js"></script>
+  <script src="./assets/js/libs/jquery.marquee.min.js"></script>
+  <script src="./assets/js/libs/axios.js"></script>
+  <script src="./assets/js/libs/jwt-decoded.js"></script>
+  <!-- app -->
+  <script src="./assets/js/services.js"></script>
+  <script src="./assets/js/app.js"></script>
+</body>
+
+</html>
