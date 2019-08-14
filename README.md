@@ -31,6 +31,12 @@ example:  `https://youtube.com/watch?v=XL9HQsWFxgY`
 
 `YOUTUBE_ID` is `XL9HQsWFxgY`
 
+To mute youtube sound add option `mute=1` in youtube url
+
+```
+https://www.youtube.com/embed/YOUTUBE_ID?playlist=YOUTUBE_ID&mute=1
+```
+
 ## Runnig
 
 ```
