@@ -34,8 +34,10 @@ example:  `https://youtube.com/watch?v=XL9HQsWFxgY`
 ## Runnig
 
 ```
-open ./service-point.html
+open ./service-point.html?servicePointId=xx
 ```
+
+`xx` = `service_point_id` in table `q4u_service_points`
 
 # Screenshort
 
