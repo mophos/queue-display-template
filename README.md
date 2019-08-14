@@ -3,7 +3,7 @@
 ## Installation
 
 ```
-copy & past
+copy & paste
 ```
 
 ## Configuration
