@@ -17,7 +17,7 @@ const API_URL = 'http://localhost:3002/v1';
 `TOKEN` Generate from Q4U web management.
 `API_URL` Q4U API url.
 
-Change Youtube ID:
+Change Youtube ID in file `service-point.html`, line `21-23`:
 
 ```
 <iframe id="ytplayer" type="text/html"
