@@ -4,7 +4,8 @@ async function serviceGetSoundList(url, token) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
-    }
+    },
+    crossdomain: true
   };
 
   return await axios.get(url, config);
@@ -16,7 +17,8 @@ async function serviceGetSoundFile(url, token) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
-    }
+    },
+    crossdomain: true
   };
 
   return await axios.get(url, config);
@@ -28,7 +30,8 @@ async function serviceGetCurrentQueue(token, url) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
-    }
+    },
+    crossdomain: true
   };
 
   return await axios.get(url, config);
@@ -39,7 +42,8 @@ async function serviceGetServicePointList(url, token) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
-    }
+    },
+    crossdomain: true
   };
 
   return await axios.get(url, config);
@@ -52,7 +56,8 @@ async function serviceGetServicePointSound(url, token) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
-    }
+    },
+    crossdomain: true
   };
 
   return await axios.get(url, config);
@@ -64,7 +69,8 @@ async function serviceGetNextQueue(url, token) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
-    }
+    },
+    crossdomain: true
   };
 
   return await axios.get(url, config);
