@@ -16,7 +16,10 @@
 <body class="d-flex flex-column h-100">
   <!-- Begin page content -->
   <main role="main" class="flex-shrink-0" style="height: 95%;">
-    <div class="row" style="height: 100%; width: 100%;">
+    <div class="row" style="min-height:100vh; width: 100%;">
+      <div class="col-md-12">
+        <span class="btn btn-secondary btn-lg btn-block" style="height: 4vh" id="txtServicePointName"></span>
+      </div>
       <div class="col-md-8">
         <iframe id="ytplayer" type="text/html"
           src="https://www.youtube.com/embed/XL9HQsWFxgY?playlist=XL9HQsWFxgY&enablejsapi=0&controls=1&loop=1&autoplay=1&origin=http://ict.moph.go.th"
@@ -24,15 +27,13 @@
       </div>
       <div class="col-md-4">
         <div class="alert alert-dismissible alert-danger" id="alertErrorMqtt">
-          <!-- <button type="button" class="close" data-dismiss="alert">&times;</button> -->
           <strong>คำเตือน!</strong> ไม่สามารถเชื่อมต่อ MQTT เซิร์ฟเวอร์ได้
         </div>
-        <span class="mt-2 btn btn-secondary btn-lg btn-block" id="txtServicePointName"></span>
-        <div class="card text-white bg-success mb-2 mt-2">
+        <div class="card text-white bg-success mb-2 mt-2" style="min-height: 47vh;">
           <div class="card-header">
             <div class="row">
-              <div class="col-md-8">คิวรับบริการ</div>
-              <div class="col-md-4">ห้องตรวจ</div>
+              <div class="col-md-7">คิวรับบริการ</div>
+              <div class="col-md-5">ห้องตรวจ</div>
             </div>
           </div>
           <div class="card-body">
@@ -41,15 +42,10 @@
             </div>
           </div>
         </div>
-
-        <div class="card text-white bg-warning mb-2 mt-2">
+        <div class="card text-white bg-warning mb-2 mt-2" style="min-height: 47vh;max-height: 47vh">
           <div class="card-header">
             <div class="row">
               <div class="col-md-12 text-center">รอเรียก</div>
-            </div>
-            <div class="row">
-              <div class="col-md-8">คิวรับบริการ</div>
-              <div class="col-md-4">HN</div>
             </div>
           </div>
           <div class="card-body">
@@ -60,13 +56,17 @@
     </div>
   </main>
 
-  <footer class="footer mt-auto py-3 bg-success text-white">
-    <div style="width: 100%;" class='marquee' data-speed="100" data-direction="left">
-      <span class="font-weight-bolder h4">
-        โรงพยาบาลกันทรวิชัยเปิดรับบริการผู้ป่วยนอกเวลา แผนกทันตกรรม ทุกวันพุธ - ศุกร์
-      </span>
+  <div class="row">
+    <div class="col-md-8">
+      <footer class="footer mt-auto py-3 bg-success text-white">
+        <div style="width: 100%;" class='marquee' data-speed="100" data-direction="left">
+          <span class="font-weight-bolder h4">
+            โรงพยาบาลกันทรวิชัยเปิดรับบริการผู้ป่วยนอกเวลา แผนกทันตกรรม ทุกวันพุธ - ศุกร์
+          </span>
+        </div>
+      </footer>
     </div>
-  </footer>
+  </div>
 
   <div class="modal" id="modalServicepoints">
     <div class="modal-dialog" role="document">
@@ -100,7 +100,7 @@
   <script src="./assets/js/libs/jwt-decoded.js"></script>
   <!-- app -->
   <script src="./assets/js/config.js"></script>
-  <script src="./assets/js/service-point.js"></script>
+  <script src="./assets/js/service-point-2.js"></script>
 </body>
 
 </html>

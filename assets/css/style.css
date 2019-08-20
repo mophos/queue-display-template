@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
 }
@@ -13,11 +14,11 @@ iframe {
 }
 
 .marquee,
-  .marquee-with-options,
-  .marquee-vert-before,
-  .marquee-vert {
-    width: 100%;
-    overflow: hidden;
+.marquee-with-options,
+.marquee-vert-before,
+.marquee-vert {
+  width: 100%;
+  overflow: hidden;
 }
 
 .card .card-header {
@@ -36,4 +37,8 @@ iframe {
   background-color: #00bc8c;
   color: white;
   border-color: #00bc8c;
+}
+
+.box {
+  min-height: 48vh;
 }

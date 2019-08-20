@@ -1,8 +1,3 @@
-/***************** กำหนดค่าการใช้งาน *******************/
-const TOKEN = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZSI6Img0dSIsImRlc2NyaXB0aW9uIjoiZm9yIGFjY2VzcyBRNFUgYXBpIiwiUVVFVUVfQ0VOVEVSX1RPUElDIjoicXVldWUvY2VudGVyIiwiU0VSVklDRV9QT0lOVF9UT1BJQyI6InF1ZXVlL3NlcnZpY2UtcG9pbnQiLCJERVBBUlRNRU5UX1RPUElDIjoicXVldWUvZGVwYXJ0bWVudCIsIkdST1VQX1RPUElDIjoicXVldWUvZ3JvdXAiLCJOT1RJRllfVVNFUiI6InE0dSIsIk5PVElGWV9QQVNTV09SRCI6IiMjcTR1IyMiLCJOT1RJRllfU0VSVkVSIjoiMTI3LjAuMC4xIiwiTk9USUZZX1BPUlQiOiI4ODg4IiwiU1BFQUtfU0lOR0xFIjoiTiIsImlhdCI6MTU2NTc1NDY4NSwiZXhwIjoxNTk3MzEyMjg1fQ.tX5Y8vElmnv_cH7neNBD3-2HNPsfpJHW64PxVi6unHA`;
-const API_URL = 'http://localhost:3002/v1';
-/*****************************************************/
-
 const DECODED = jwt_decode(TOKEN);
 
 const WS_SERVER = DECODED.NOTIFY_SERVER || 'localhost';
@@ -282,13 +277,13 @@ function _setCurrentQueueList(queues) {
 
       if (v.queue_number === currentQueueNumber) {
         _list = $(`<div class="row bg-danger">
-              <div class="col-md-8"><span class="queue-number">${v.queue_number}</span></div>
-              <div class="col-md-4 text-center"><span class="queue-number">${v.room_number}</span></div>
+              <div class="col-md-7"><span class="queue-number">${v.queue_number}</span></div>
+              <div class="col-md-5 text-center"><span class="queue-number">${v.room_number}</span></div>
             </div>`);
       } else {
         _list = $(`<div class="row">
-              <div class="col-md-8"><span class="queue-number">${v.queue_number}</span></div>
-              <div class="col-md-4 text-center"><span class="queue-number">${v.room_number}</span></div>
+              <div class="col-md-7"><span class="queue-number">${v.queue_number}</span></div>
+              <div class="col-md-5 text-center"><span class="queue-number">${v.room_number}</span></div>
             </div>`);
       }
 
@@ -306,7 +301,7 @@ async function _getCurrentQueue() {
 
   const _url = `${API_URL}/queue/working/${_servicePointId}`;
   try {
-    const rs = await serviceGetCurrentQueue(TOKEN, _url);
+    const rs = await serviceGet(_url, TOKEN);
     const data = rs.data;
 
     if (data.statusCode === 200) {
@@ -339,7 +334,7 @@ async function _getCurrentQueue() {
 async function _getSoundList(_servicePointId) {
   const _url = `${API_URL}/queue/sound/service-room?servicePointId=${_servicePointId}`;
   try {
-    const rs = await serviceGetSoundList(_url, TOKEN);
+    const rs = await serviceGet(_url, TOKEN);
 
     const data = rs.data;
     if (data.statusCode === 200) {
@@ -355,7 +350,7 @@ async function _getSoundList(_servicePointId) {
 async function _getSoundFile(_servicePointId) {
   const _url = `${API_URL}/queue/sound/service-point?servicePointId=${_servicePointId}`;
   try {
-    const rs = await serviceGetSoundFile(_url, TOKEN);
+    const rs = await serviceGet(_url, TOKEN);
 
     const data = rs.data;
     if (data.statusCode === 200) {
@@ -371,33 +366,25 @@ async function _getSoundFile(_servicePointId) {
 
 function _setNextQueueList(items) {
   if (items.length) {
-
     let list = $('#nextQueueList');
     list.empty();
-
+    let _list = '<div class="row">';
     _.forEach(items, (v, i) => {
-      let _list = `
-      <div class="row">
-        <div class="col-md-8"><span class="queue-number-sm">${v.queue_number}</span></div>
-        <div class="col-md-4"><span class="queue-number-sm">${v.hn}</span></div>
-      </div>
-      `;
-
-      list.append(_list);
-
+      let col = `  <div class="col-md-6"><span class="queue-number-sm">${v.queue_number}</span></div>`;
+      _list += col;
     });
-
+    _list += '</div>';
+    list.append(_list);
+    console.log(list[0].outerHTML);
   }
 }
 
 async function _getNextQueue() {
-
   const _servicePointId = sessionStorage.getItem('servicePointId');
-
-  const _url = `${API_URL}/queue/next-queue/service-point?servicePointId=${_servicePointId}`;
+  const limit = 5;
+  const _url = `${API_URL}/queue/next-queue/service-point?servicePointId=${_servicePointId}&limit=${limit}`;
   try {
-    const rs = await serviceGetNextQueue(_url, TOKEN);
-
+    const rs = await serviceGet(_url, TOKEN);
     const data = rs.data;
     if (data.statusCode === 200) {
       _setNextQueueList(data.results);
@@ -412,7 +399,7 @@ async function _getNextQueue() {
 async function _getServicePointList(_servicePointId) {
   try {
     const _url = `${API_URL}/queue/service-points`;
-    const rs = await serviceGetServicePointList(_url, TOKEN);
+    const rs = await serviceGet(_url, TOKEN);
 
     const data = rs.data;
 
@@ -432,6 +419,20 @@ async function _getServicePointList(_servicePointId) {
 
 function setServicePointId(id) {
   servicePointId = id;
+}
+
+
+async function serviceGet(url, token) {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    crossdomain: true
+  };
+
+  return await axios.get(url, config);
+
 }
 
 $(document).ready(function () {
