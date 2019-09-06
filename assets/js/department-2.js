@@ -9,7 +9,7 @@ const WS_PASSWORD = DECODED.NOTIFY_PASSWORD || '##q4u##';
 const NOTIFY_URL = `ws://${WS_SERVER}:${WS_PORT}`;
 const CLIENT_ID = `Q4U-MONITOR-${new Date().getTime()}`;
 
-const SERVICE_POINT_TOPIC = DECODED.SERVICE_POINT_TOPIC || 'queue/service-point'; // จากไฟล์ queue-config
+const DEPARTMENT_TOPIC = DECODED.DEPARTMENT_TOPIC || 'queue/department'; // จากไฟล์ queue-config
 
 let topic = '';
 
@@ -33,7 +33,7 @@ let soundList = [];
 
 let mqttClient;
 
-let servicePointId = 0;
+let departmentId = 0;
 
 function getUrlParams(url) {
   return `${url}?`.split('?')[1]
@@ -50,27 +50,27 @@ function initialSocket() {
     password: WS_PASSWORD
   });
 
-  mqttClient.on('message', (topic, payload) => {
-    console.log(topic);
-
+  mqttClient.on('message', async (topic, payload) => {
     try {
       const _payload = JSON.parse(payload.toString());
-
       console.log(_payload);
+      if (_payload.message == 'update_visit') {
+        await _getCurrentQueue();
+        await _getNextQueue();
+      } else {
+        await _getCurrentQueue();
+        await _getNextQueue();
 
-      _getCurrentQueue();
-      _getNextQueue();
+        if (isSound) {
+          const _departmentId = sessionStorage.getItem('departmentId');
 
-      if (isSound) {
+          if (+_departmentId === +_payload.departmentId) {
+            // play sound
+            const sound = { queueNumber: _payload.queueNumber, roomNumber: _payload.roomNumber.toString(), isInterview: _payload.isInterview, roomId: _payload.roomId };
+            playlists.push(sound);
 
-        const _servicePointId = sessionStorage.getItem('servicePointId');
-
-        if (+_servicePointId === +_payload.servicePointId) {
-          // play sound
-          const sound = { queueNumber: _payload.queueNumber, roomNumber: _payload.roomNumber.toString(), isInterview: _payload.isInterview, roomId: _payload.roomId };
-          playlists.push(sound);
-
-          prepareSound();
+            prepareSound();
+          }
         }
       }
     } catch (error) {
@@ -203,7 +203,6 @@ function playSound(
   }
 
   audioFiles.push('./assets/audio/ka.mp3');
-
   const howlerBank = [];
 
   const loop = false;
@@ -297,9 +296,9 @@ function _setCurrentQueueList(queues) {
 }
 
 async function _getCurrentQueue() {
-  const _servicePointId = sessionStorage.getItem('servicePointId');
+  const _departmentId = sessionStorage.getItem('departmentId');
 
-  const _url = `${API_URL}/queue/working/${_servicePointId}`;
+  const _url = `${API_URL}/queue/working/department/${_departmentId}`;
   try {
     const rs = await serviceGet(_url, TOKEN);
     const data = rs.data;
@@ -331,24 +330,24 @@ async function _getCurrentQueue() {
   }
 }
 
-async function _getSoundList(_servicePointId) {
-  const _url = `${API_URL}/queue/sound/service-room?servicePointId=${_servicePointId}`;
-  try {
-    const rs = await serviceGet(_url, TOKEN);
+// async function _getSoundList(_departmentId) {
+//   const _url = `${API_URL}/queue/service-points`;
+//   try {
+//     const rs = await serviceGet(_url, TOKEN);
 
-    const data = rs.data;
-    if (data.statusCode === 200) {
-      soundList = data.results;
-    } else {
-      console.log(error);
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}
+//     const data = rs.data;
+//     if (data.statusCode === 200) {
+//       soundList = data.results;
+//     } else {
+//       console.log(error);
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 
-async function _getSoundFile(_servicePointId) {
-  const _url = `${API_URL}/queue/sound/service-point?servicePointId=${_servicePointId}`;
+async function _getSoundFile(_departmentId) {
+  const _url = `${API_URL}/queue/sound/service-point?departmentId=${_departmentId}`;
   try {
     const rs = await serviceGet(_url, TOKEN);
 
@@ -379,9 +378,9 @@ function _setNextQueueList(items) {
 }
 
 async function _getNextQueue() {
-  const _servicePointId = sessionStorage.getItem('servicePointId');
-  const limit = 5;
-  const _url = `${API_URL}/queue/next-queue/service-point?servicePointId=${_servicePointId}&limit=${limit}`;
+  const _departmentId = sessionStorage.getItem('departmentId');
+  const limit = 20;
+  const _url = `${API_URL}/queue/next-queue/department?departmentId=${_departmentId}&limit=${limit}`;
   try {
     const rs = await serviceGet(_url, TOKEN);
     const data = rs.data;
@@ -395,18 +394,16 @@ async function _getNextQueue() {
   }
 }
 
-async function _getServicePointList(_servicePointId) {
+async function _getServicePointList(_departmentId) {
   try {
     const _url = `${API_URL}/queue/service-points`;
     const rs = await serviceGet(_url, TOKEN);
-
     const data = rs.data;
-
     if (data.statusCode === 200) {
-      const idx = _.findIndex(data.results, { service_point_id: +_servicePointId });
+      const idx = _.findIndex(data.results, { department_id: +_departmentId });
       if (idx > -1) {
-        const _servicePointName = data.results[idx].service_point_name || 'ไม่พบจุดให้บริการ';
-        $('#txtServicePointName').text(_servicePointName);
+        const _departmentName = data.results[idx].department_name || 'ไม่พบจุดให้บริการ';
+        $('#txtDepartmentName').text(_departmentName);
       }
     } else {
       console.log(data.error);
@@ -416,8 +413,8 @@ async function _getServicePointList(_servicePointId) {
   }
 }
 
-function setServicePointId(id) {
-  servicePointId = id;
+function setdepartmentId(id) {
+  departmentId = id;
 }
 
 
@@ -429,9 +426,7 @@ async function serviceGet(url, token) {
     },
     crossdomain: true
   };
-
   return await axios.get(url, config);
-
 }
 
 $(document).ready(function () {
@@ -440,11 +435,11 @@ $(document).ready(function () {
 
   console.log(params);
 
-  let SERVICE_POINT_ID = +params.servicePointId;
+  let DEPARTMENT_ID = +params.departmentId;
 
-  sessionStorage.setItem('servicePointId', SERVICE_POINT_ID);
+  sessionStorage.setItem('departmentId', DEPARTMENT_ID);
 
-  topic = `${SERVICE_POINT_TOPIC}/${SERVICE_POINT_ID}`;
+  topic = `${DEPARTMENT_TOPIC}/${DEPARTMENT_ID}`;
 
   // เชื่อมต่อกับ MQTT Server 
   initialSocket();
@@ -452,9 +447,9 @@ $(document).ready(function () {
   _getCurrentQueue();
   _getNextQueue();
 
-  _getServicePointList(SERVICE_POINT_ID);
-  _getSoundList(SERVICE_POINT_ID);
-  _getSoundFile(SERVICE_POINT_ID);
+  _getServicePointList(DEPARTMENT_ID);
+  // _getSoundList(DEPARTMENT_ID);
+  // _getSoundFile(DEPARTMENT_ID);
   // เปิดหน้าจอเลือกแผนก
   $('#btnOpenServicepoint').on('click', (e) => {
     e.preventDefault();

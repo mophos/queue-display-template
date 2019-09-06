@@ -275,12 +275,12 @@ function _setCurrentQueueList(queues) {
       let _list;
 
       if (v.queue_number === currentQueueNumber) {
-        _list = $(`<div class="row bg-danger">
+        _list = $(`<div class="row bg-danger queue-number-sm" >
               <div class="col-md-7"><span class="queue-number">${v.queue_number}</span></div>
               <div class="col-md-5 text-center"><span class="queue-number">${v.room_number}</span></div>
             </div>`);
       } else {
-        _list = $(`<div class="row">
+        _list = $(`<div class="row queue-number-sm">
               <div class="col-md-7"><span class="queue-number">${v.queue_number}</span></div>
               <div class="col-md-5 text-center"><span class="queue-number">${v.room_number}</span></div>
             </div>`);
@@ -370,9 +370,9 @@ function _setNextQueueList(items) {
 
     _.forEach(items, (v, i) => {
       let _list = `
-      <div class="row">
-        <div class="col-md-7"><span class="queue-number-sm">${v.queue_number}</span></div>
-        <div class="col-md-5"><span class="queue-number-sm">${v.hn}</span></div>
+      <div class="row" >
+        <div class="col-md-7" style="font-size: 3.3vh"><span class="queue-number-sm">${v.queue_number}</span></div>
+        <div class="col-md-5" style="font-size: 3.3vh"><span class="queue-number-sm">${v.hn}</span></div>
       </div>
       `;
 
@@ -406,14 +406,12 @@ async function _getServicePointList(_departmentId) {
   try {
     const _url = `${API_URL}/queue/service-points`;
     const rs = await serviceGet(_url, TOKEN);
-
     const data = rs.data;
-
     if (data.statusCode === 200) {
-      const idx = _.findIndex(data.results, { DEPARTMENT_ID: +_departmentId });
+      const idx = _.findIndex(data.results, { department_id: +_departmentId });
       if (idx > -1) {
-        const _servicePointName = data.results[idx].service_point_name || 'ไม่พบจุดให้บริการ';
-        $('#txtServicePointName').text(_servicePointName);
+        const _departmentName = data.results[idx].department_name || 'ไม่พบจุดให้บริการ';
+        $('#txtDepartmentName').text(_departmentName);
       }
     } else {
       console.log(data.error);

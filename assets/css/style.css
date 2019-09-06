@@ -26,11 +26,11 @@ iframe {
 }
 
 .queue-number {
-  font-size: 2.8rem;
+  font-size: 4.8vh;
 }
 
 .queue-number-sm {
-  font-size: 2rem;
+  font-size: 3vh;
 }
 
 .list-group-item.active {
@@ -41,4 +41,23 @@ iframe {
 
 .box {
   min-height: 48vh;
+}
+
+.box-head {
+  width: 100%;
+  height: 100%;
+  /* min-height: 6vh; */
+  background: #444;
+  border-radius: 0.5vh;
+
+}
+
+.box-detail {
+  font-size: 2.5vh;
+  position: absolute;
+  top: 3.5vh;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
