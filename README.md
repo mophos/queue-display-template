@@ -7,7 +7,7 @@ copy & paste
 ```
 
 ## Configuration
-Change configuration in `app.js`
+Change configuration in `config.js`
 
 ```
 const TOKEN = `xxx`;

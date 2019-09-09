@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="./assets/css/bootstrap-darkly.css">
+  <link rel="stylesheet" href="./assets/css/style.css">
+
+  <title>Queue Monitor</title>
+</head>
+
+<body style="width: 99%;margin-left: 0.5%;">
+  <!-- <main role="main"> -->
+  <div class="alert alert-dismissible alert-danger" id="alertErrorMqtt">
+    <strong>คำเตือน!</strong> ไม่สามารถเชื่อมต่อ MQTT เซิร์ฟเวอร์ได้
+  </div>
+  <div style="height: 5vh;margin-top:1vh">
+    <div class="box-head">
+      <span class="box-detail" id="txtServicePointName"></span>
+    </div>
+  </div>
+  <div style="height: 87vh;">
+    <div class="row">
+      <div class="col-md-7">
+        <div class="card text-white bg-success mb-2 mt-2" style="min-height: 87vh;max-height: 87vh">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-md-7">คิวรับบริการ</div>
+              <div class="col-md-5">ห้องตรวจ</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="currentList">
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="card text-white bg-warning mb-2 mt-2" style="min-height: 87vh;max-height: 87vh">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-md-12 text-center">รอเรียก</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="nextQueueList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="height: 5vh;margin-top:2vh ;background-color:#00bc8c;padding-top: 0.8vh">
+    <div style="width: 100%;" class='marquee' data-speed="100" data-direction="left">
+      <span class="font-weight-bolder" style="font-size: 2.5vh">
+        โรงพยาบาลกันทรวิชัยเปิดรับบริการผู้ป่วยนอกเวลา แผนกทันตกรรม ทุกวันพุธ - ศุกร์
+      </span>
+    </div>
+  </div>
+  <!-- libs -->
+  <script src="./assets/js/libs/jquery.js"></script>
+  <script src="./assets/js/libs/popper.js"></script>
+  <script src="./assets/js/libs/bootstrap.min.js"></script>
+  <script src="./assets/js/libs/howler.js"></script>
+  <script src="./assets/js/libs/moment.js"></script>
+  <script src="./assets/js/libs/lodash.js"></script>
+  <script src="./assets/js/libs/mqtt.js"></script>
+  <script src="./assets/js/libs/jquery.marquee.min.js"></script>
+  <script src="./assets/js/libs/axios.js"></script>
+  <script src="./assets/js/libs/jwt-decoded.js"></script>
+  <!-- app -->
+  <script src="./assets/js/config.js"></script>
+  <script src="./assets/js/service-point-3.js"></script>
+</body>
+
+
+</html>

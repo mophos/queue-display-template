@@ -1,8 +1,3 @@
-/***************** กำหนดค่าการใช้งาน *******************/
-const TOKEN = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZSI6Img0dSIsImRlc2NyaXB0aW9uIjoiZm9yIGFjY2VzcyBRNFUgYXBpIiwiUVVFVUVfQ0VOVEVSX1RPUElDIjoicXVldWUvY2VudGVyIiwiU0VSVklDRV9QT0lOVF9UT1BJQyI6InF1ZXVlL3NlcnZpY2UtcG9pbnQiLCJERVBBUlRNRU5UX1RPUElDIjoicXVldWUvZGVwYXJ0bWVudCIsIkdST1VQX1RPUElDIjoicXVldWUvZ3JvdXAiLCJOT1RJRllfVVNFUiI6InE0dSIsIk5PVElGWV9QQVNTV09SRCI6IiMjcTR1IyMiLCJOT1RJRllfU0VSVkVSIjoiMTI3LjAuMC4xIiwiTk9USUZZX1BPUlQiOiI4ODg4IiwiU1BFQUtfU0lOR0xFIjoiTiIsImlhdCI6MTU2NTc1NDY4NSwiZXhwIjoxNTk3MzEyMjg1fQ.tX5Y8vElmnv_cH7neNBD3-2HNPsfpJHW64PxVi6unHA`;
-const API_URL = 'http://localhost:3002/v1';
-/*****************************************************/
-
 const DECODED = jwt_decode(TOKEN);
 
 const WS_SERVER = DECODED.NOTIFY_SERVER || 'localhost';
@@ -14,7 +9,7 @@ const WS_PASSWORD = DECODED.NOTIFY_PASSWORD || '##q4u##';
 const NOTIFY_URL = `ws://${WS_SERVER}:${WS_PORT}`;
 const CLIENT_ID = `Q4U-MONITOR-${new Date().getTime()}`;
 
-const SERVICE_POINT_TOPIC = DECODED.SERVICE_POINT_TOPIC || 'queue/service-point'; // จากไฟล์ queue-config
+const DEPARTMENT_TOPIC = DECODED.DEPARTMENT_TOPIC || 'queue/department'; // จากไฟล์ queue-config
 
 let topic = '';
 
@@ -38,7 +33,7 @@ let soundList = [];
 
 let mqttClient;
 
-let servicePointId = 0;
+let departmentId = 0;
 
 function getUrlParams(url) {
   return `${url}?`.split('?')[1]
@@ -55,27 +50,27 @@ function initialSocket() {
     password: WS_PASSWORD
   });
 
-  mqttClient.on('message', (topic, payload) => {
-    console.log(topic);
-
+  mqttClient.on('message', async (topic, payload) => {
     try {
       const _payload = JSON.parse(payload.toString());
-
       console.log(_payload);
+      if (_payload.message == 'update_visit') {
+        await _getCurrentQueue();
+        await _getNextQueue();
+      } else {
+        await _getCurrentQueue();
+        await _getNextQueue();
 
-      _getCurrentQueue();
-      _getNextQueue();
+        if (isSound) {
+          const _departmentId = sessionStorage.getItem('departmentId');
 
-      if (isSound) {
+          if (+_departmentId === +_payload.departmentId) {
+            // play sound
+            const sound = { queueNumber: _payload.queueNumber, roomNumber: _payload.roomNumber.toString(), isInterview: _payload.isInterview, roomId: _payload.roomId };
+            playlists.push(sound);
 
-        const _servicePointId = sessionStorage.getItem('servicePointId');
-
-        if (+_servicePointId === +_payload.servicePointId) {
-          // play sound
-          const sound = { queueNumber: _payload.queueNumber, roomNumber: _payload.roomNumber.toString(), isInterview: _payload.isInterview, roomId: _payload.roomId };
-          playlists.push(sound);
-
-          prepareSound();
+            prepareSound();
+          }
         }
       }
     } catch (error) {
@@ -208,7 +203,6 @@ function playSound(
   }
 
   audioFiles.push('./assets/audio/ka.mp3');
-
   const howlerBank = [];
 
   const loop = false;
@@ -282,13 +276,13 @@ function _setCurrentQueueList(queues) {
 
       if (v.queue_number === currentQueueNumber) {
         _list = $(`<div class="row bg-danger">
-              <div class="col-md-8"><span class="queue-number">${v.queue_number}</span></div>
-              <div class="col-md-4 text-center"><span class="queue-number">${v.room_number}</span></div>
+              <div class="col-md-7"><span class="queue-number">${v.queue_number}</span></div>
+              <div class="col-md-5 text-center"><span class="queue-number">${v.room_number}</span></div>
             </div>`);
       } else {
         _list = $(`<div class="row">
-              <div class="col-md-8"><span class="queue-number">${v.queue_number}</span></div>
-              <div class="col-md-4 text-center"><span class="queue-number">${v.room_number}</span></div>
+              <div class="col-md-7"><span class="queue-number">${v.queue_number}</span></div>
+              <div class="col-md-5 text-center"><span class="queue-number">${v.room_number}</span></div>
             </div>`);
       }
 
@@ -302,11 +296,11 @@ function _setCurrentQueueList(queues) {
 }
 
 async function _getCurrentQueue() {
-  const _servicePointId = sessionStorage.getItem('servicePointId');
+  const _departmentId = sessionStorage.getItem('departmentId');
 
-  const _url = `${API_URL}/queue/working/${_servicePointId}`;
+  const _url = `${API_URL}/queue/working/department/${_departmentId}`;
   try {
-    const rs = await serviceGetCurrentQueue(TOKEN, _url);
+    const rs = await serviceGet(_url, TOKEN);
     const data = rs.data;
 
     if (data.statusCode === 200) {
@@ -336,26 +330,26 @@ async function _getCurrentQueue() {
   }
 }
 
-async function _getSoundList(_servicePointId) {
-  const _url = `${API_URL}/queue/sound/service-room?servicePointId=${_servicePointId}`;
-  try {
-    const rs = await serviceGetSoundList(_url, TOKEN);
+// async function _getSoundList(_departmentId) {
+//   const _url = `${API_URL}/queue/service-points`;
+//   try {
+//     const rs = await serviceGet(_url, TOKEN);
 
-    const data = rs.data;
-    if (data.statusCode === 200) {
-      soundList = data.results;
-    } else {
-      console.log(error);
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}
+//     const data = rs.data;
+//     if (data.statusCode === 200) {
+//       soundList = data.results;
+//     } else {
+//       console.log(error);
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 
-async function _getSoundFile(_servicePointId) {
-  const _url = `${API_URL}/queue/sound/service-point?servicePointId=${_servicePointId}`;
+async function _getSoundFile(_departmentId) {
+  const _url = `${API_URL}/queue/sound/service-point?departmentId=${_departmentId}`;
   try {
-    const rs = await serviceGetSoundFile(_url, TOKEN);
+    const rs = await serviceGet(_url, TOKEN);
 
     const data = rs.data;
     if (data.statusCode === 200) {
@@ -371,33 +365,24 @@ async function _getSoundFile(_servicePointId) {
 
 function _setNextQueueList(items) {
   if (items.length) {
-
     let list = $('#nextQueueList');
     list.empty();
-
+    let _list = '<div class="row">';
     _.forEach(items, (v, i) => {
-      let _list = `
-      <div class="row">
-        <div class="col-md-8"><span class="queue-number-sm">${v.queue_number}</span></div>
-        <div class="col-md-4"><span class="queue-number-sm">${v.hn}</span></div>
-      </div>
-      `;
-
-      list.append(_list);
-
+      let col = `  <div class="col-md-6"><span class="queue-number-sm">${v.queue_number}</span></div>`;
+      _list += col;
     });
-
+    _list += '</div>';
+    list.append(_list);
   }
 }
 
 async function _getNextQueue() {
-
-  const _servicePointId = sessionStorage.getItem('servicePointId');
-
-  const _url = `${API_URL}/queue/next-queue/service-point?servicePointId=${_servicePointId}`;
+  const _departmentId = sessionStorage.getItem('departmentId');
+  const limit = 20;
+  const _url = `${API_URL}/queue/next-queue/department?departmentId=${_departmentId}&limit=${limit}`;
   try {
-    const rs = await serviceGetNextQueue(_url, TOKEN);
-
+    const rs = await serviceGet(_url, TOKEN);
     const data = rs.data;
     if (data.statusCode === 200) {
       _setNextQueueList(data.results);
@@ -409,18 +394,16 @@ async function _getNextQueue() {
   }
 }
 
-async function _getServicePointList(_servicePointId) {
+async function _getServicePointList(_departmentId) {
   try {
     const _url = `${API_URL}/queue/service-points`;
-    const rs = await serviceGetServicePointList(_url, TOKEN);
-
+    const rs = await serviceGet(_url, TOKEN);
     const data = rs.data;
-
     if (data.statusCode === 200) {
-      const idx = _.findIndex(data.results, { service_point_id: +_servicePointId });
+      const idx = _.findIndex(data.results, { department_id: +_departmentId });
       if (idx > -1) {
-        const _servicePointName = data.results[idx].service_point_name || 'ไม่พบจุดให้บริการ';
-        $('#txtServicePointName').text(_servicePointName);
+        const _departmentName = data.results[idx].department_name || 'ไม่พบจุดให้บริการ';
+        $('#txtDepartmentName').text(_departmentName);
       }
     } else {
       console.log(data.error);
@@ -430,8 +413,20 @@ async function _getServicePointList(_servicePointId) {
   }
 }
 
-function setServicePointId(id) {
-  servicePointId = id;
+function setdepartmentId(id) {
+  departmentId = id;
+}
+
+
+async function serviceGet(url, token) {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    crossdomain: true
+  };
+  return await axios.get(url, config);
 }
 
 $(document).ready(function () {
@@ -440,11 +435,11 @@ $(document).ready(function () {
 
   console.log(params);
 
-  let SERVICE_POINT_ID = +params.servicePointId;
+  let DEPARTMENT_ID = +params.departmentId;
 
-  sessionStorage.setItem('servicePointId', SERVICE_POINT_ID);
+  sessionStorage.setItem('departmentId', DEPARTMENT_ID);
 
-  topic = `${SERVICE_POINT_TOPIC}/${SERVICE_POINT_ID}`;
+  topic = `${DEPARTMENT_TOPIC}/${DEPARTMENT_ID}`;
 
   // เชื่อมต่อกับ MQTT Server 
   initialSocket();
@@ -452,9 +447,9 @@ $(document).ready(function () {
   _getCurrentQueue();
   _getNextQueue();
 
-  _getServicePointList(SERVICE_POINT_ID);
-  _getSoundList(SERVICE_POINT_ID);
-  _getSoundFile(SERVICE_POINT_ID);
+  _getServicePointList(DEPARTMENT_ID);
+  // _getSoundList(DEPARTMENT_ID);
+  // _getSoundFile(DEPARTMENT_ID);
   // เปิดหน้าจอเลือกแผนก
   $('#btnOpenServicepoint').on('click', (e) => {
     e.preventDefault();
